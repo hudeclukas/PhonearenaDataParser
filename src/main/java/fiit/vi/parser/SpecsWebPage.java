@@ -29,7 +29,7 @@ public class SpecsWebPage {
     public static final String FEATURES =   "FEATURES";
     public static final String BATTERY  =   "BATTERY";
     public static final String MISC     =   "MISC";
-    public static final String PRICE     =   "PRICE";
+    public static final String PRICE    =   "PRICE";
     public static final String P_GROUP  =   "PRICE GROUP";
 
     private String fullSpecs;
