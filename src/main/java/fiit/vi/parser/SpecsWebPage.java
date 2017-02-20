@@ -15,26 +15,27 @@ public class SpecsWebPage {
         public String interval = "";
     }
 
-    public static final String NETWORK  =   "NETWORK";
-    public static final String LAUNCH   =   "LAUNCH";
-    public static final String ANNOUNCED =  "ANNOUNCED";
-    public static final String RELEASED =   "RELEASED";
-    public static final String BODY     =   "BODY";
-    public static final String DISPLAY  =   "DISPLAY";
-    public static final String PLATFORM =   "PLATFORM";
-    public static final String MEMORY   =   "MEMORY";
-    public static final String CAMERA   =   "CAMERA";
-    public static final String SOUND    =   "SOUND";
-    public static final String COMMONS  =   "COMMS";
-    public static final String FEATURES =   "FEATURES";
-    public static final String BATTERY  =   "BATTERY";
-    public static final String MISC     =   "MISC";
-    public static final String PRICE    =   "PRICE";
-    public static final String P_GROUP  =   "PRICE GROUP";
+    public static final String NETWORK = "NETWORK";
+    public static final String LAUNCH = "LAUNCH";
+    public static final String ANNOUNCED = "ANNOUNCED";
+    public static final String RELEASED = "RELEASED";
+    public static final String BODY = "BODY";
+    public static final String DISPLAY = "DISPLAY";
+    public static final String PLATFORM = "PLATFORM";
+    public static final String MEMORY = "MEMORY";
+    public static final String CAMERA = "CAMERA";
+    public static final String SOUND = "SOUND";
+    public static final String COMMS = "COMMS";
+    public static final String FEATURES = "FEATURES";
+    public static final String BATTERY = "BATTERY";
+    public static final String MISC = "MISC";
+    public static final String PRICE = "PRICE";
+    public static final String P_GROUP = "PRICE GROUP";
 
     private String fullSpecs;
 
     private String title = "";
+    private String name = "";
     private String network = "";
     private String announced = "";
     private String released = "";
@@ -84,7 +85,7 @@ public class SpecsWebPage {
         platform.add(new KeyValue<String>(type, info));
     }
 
-    public void addMemoryInfo (String type, String info) {
+    public void addMemoryInfo(String type, String info) {
         if (memory == null) {
             memory = new LinkedList<>();
         }
@@ -111,7 +112,7 @@ public class SpecsWebPage {
         JSONObject object = new JSONObject();
         for (KeyValue kv :
                 memory) {
-            object.put(kv.getKey().toLowerCase() , kv.getValue());
+            object.put(kv.getKey().toLowerCase(), kv.getValue());
         }
         return object;
     }
@@ -141,6 +142,14 @@ public class SpecsWebPage {
         this.title = title;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getNetwork() {
         return network;
     }
@@ -159,8 +168,8 @@ public class SpecsWebPage {
 
     public void setLaunch(String launch) {
         List<String> launchDates = new LinkedList<>();
-        DateParser.parseDate(launch,launchDates);
-        if (launchDates.size()>=1) {
+        DateParser.parseDate(launch, launchDates);
+        if (launchDates.size() >= 1) {
             announced = launchDates.get(0);
             released = launchDates.get(0);
         }

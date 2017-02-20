@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +33,11 @@ public class Main {
         PhoneHtmlFileParser parser = new PhoneHtmlFileParser();
 
         int phones = 0;
-        List<JSONObject> allPhones = new LinkedList<>();
+        List<JSONObject> allPhones = new ArrayList<>();
 
         for (File file : htmlFiles) {
             JSONObject json = new JSONObject();
-            boolean isPhone = parser.parseFileToJson(file, PATH_TO_HTMLS+"json\\", json);
+            boolean isPhone = parser.parseFileToJson(file, PATH_TO_HTMLS+"json\\", json, false);
             if (isPhone) {
                 phones++;
                 json.put("id",phones);
@@ -44,13 +45,16 @@ public class Main {
             }
         }
 
-        File jsonFile = new File(JSON_EXPORT + "phones.json");
+        /* Parse phones into InfoVis readable format */
+
+        File jsonFile = new File(JSON_EXPORT + "phonesIndividual.json");
         OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8);
         for (JSONObject phone : allPhones) {
-            fileWriter.write("{\"index\":{\"_id\":\"" + phone.get("id")+ "\"}}\n");
+//            fileWriter.write("{\"index\":{\"_id\":\"" + phone.get("id")+ "\"}}\n");
             fileWriter.write(phone.toString());
             fileWriter.write("\n");
         }
+        fileWriter.write(allPhones.toString());
         fileWriter.flush();
         fileWriter.close();
 

@@ -19,14 +19,16 @@ public class PhoneHtmlFileParser {
     public static final String SPECS_LIST_ID = "specs-list";
     public static final String USER_COMMENTS_ID = "user-comments";
     public static final String USER_COMMENT_THREAD_ID = "user-thread";
+    public static final String PHONE_NAME = "specs-phone-name-title";
 
-    public boolean parseFileToJson(File file, String jsonPath, JSONObject json) {
+    public boolean parseFileToJson(File file, String jsonPath, JSONObject json, boolean toFile) {
 
         SpecsWebPage web = new SpecsWebPage();
-        if (parseHtmlFile(file, web) == false) return false;
+        if (!parseHtmlFile(file, web)) return false;
         jsonPath += file.getName() + ".json";
 
-        return saveToJson(web, jsonPath, json);
+
+        return saveToJson(web, jsonPath, json, toFile);
     }
 
     public boolean parseHtmlFile(File file, SpecsWebPage web) {
@@ -53,18 +55,20 @@ public class PhoneHtmlFileParser {
             }
 
             /* Parse user comments */
-            Element comments = body.getElementById(USER_COMMENTS_ID);
-            if (comments != null) {
-                final Elements userComments = comments.getElementsByClass(USER_COMMENT_THREAD_ID);
-
-                for (Element comment : userComments) {
-                    String text = comment.text();
-                    if (text.isEmpty()) continue;
-
-                    web.addComment(text);
-                }
-            }
+//            Element comments = body.getElementById(USER_COMMENTS_ID);
+//            if (comments != null) {
+//                final Elements userComments = comments.getElementsByClass(USER_COMMENT_THREAD_ID);
+//
+//                for (Element comment : userComments) {
+//                    String text = comment.text();
+//                    if (text.isEmpty()) continue;
+//
+//                    web.addComment(text);
+//                }
+//            }
             web.setTitle(title);
+            Elements name = body.getElementsByClass(PHONE_NAME);
+            web.setName(name.get(0).text());
 
             System.out.println(title + " --> parsed");
 
@@ -74,42 +78,47 @@ public class PhoneHtmlFileParser {
         return true;
     }
 
-    private boolean saveToJson(SpecsWebPage web, String jsonPath, JSONObject phoneJson) {
+    private boolean saveToJson(SpecsWebPage web, String jsonPath, JSONObject phoneJson, boolean toFile) {
         File jsonFile = new File(jsonPath);
         File jsonDir = jsonFile.getParentFile();
-
         if (!jsonDir.exists()) {
             if (jsonDir.mkdir() == false) return false;
         }
 
-        phoneJson.put("title", web.getTitle());
+        RawGSMarenaParser rp = new RawGSMarenaParser();
+//        phoneJson.put("title", web.getTitle());
+        phoneJson.put("name",web.getName());
         //phoneJson.put("specs", web);
-        phoneJson.put(SpecsWebPage.BATTERY.toLowerCase(),web.getBattery());
-        phoneJson.put(SpecsWebPage.BODY.toLowerCase(),web.getBody());
-        phoneJson.put(SpecsWebPage.CAMERA.toLowerCase(),web.getCamera());
-        phoneJson.put(SpecsWebPage.COMMONS.toLowerCase(),web.getComms());
-        phoneJson.put(SpecsWebPage.DISPLAY.toLowerCase(),web.getDisplay());
-        phoneJson.put(SpecsWebPage.FEATURES.toLowerCase(),web.getFeatures());
-        phoneJson.put(SpecsWebPage.ANNOUNCED.toLowerCase(),web.getAnnounced());
-        phoneJson.put(SpecsWebPage.RELEASED.toLowerCase(),web.getReleased());
-        phoneJson.put(SpecsWebPage.MEMORY.toLowerCase(),web.getMemory());
-        phoneJson.put(SpecsWebPage.MISC.toLowerCase(),web.getMiscellaneous());
-        phoneJson.put(SpecsWebPage.PRICE.toLowerCase(),web.getPrice());
-        phoneJson.put(SpecsWebPage.P_GROUP.toLowerCase(),web.getPriceGroup());
-        phoneJson.put(SpecsWebPage.NETWORK.toLowerCase(),web.getNetwork());
-        phoneJson.put(SpecsWebPage.PLATFORM.toLowerCase(),web.getPlatform());
-        phoneJson.put(SpecsWebPage.SOUND.toLowerCase(),web.getSound());
-        phoneJson.put("comments",web.getComments());
+        phoneJson.put(SpecsWebPage.BATTERY.toLowerCase(), rp.parseBattery(web.getBattery())); // mAh
+        phoneJson.put(SpecsWebPage.BODY.toLowerCase(), rp.parseWeight(web.getBody())); // weight
+        phoneJson.put(SpecsWebPage.CAMERA.toLowerCase(), rp.parseCameraMP(web.getCamera())); // primary MP
+//        phoneJson.put(SpecsWebPage.COMMS.toLowerCase(), web.getComms());
+        phoneJson.put(SpecsWebPage.DISPLAY.toLowerCase(), rp.parseDisplay(web.getDisplay())); // size "
+//        phoneJson.put(SpecsWebPage.FEATURES.toLowerCase(), web.getFeatures());
+//        phoneJson.put(SpecsWebPage.ANNOUNCED.toLowerCase(), web.getAnnounced());
+//        phoneJson.put(SpecsWebPage.RELEASED.toLowerCase(), web.getReleased());
+        phoneJson.put("ram", rp.parseRam(web.getMemory().getString("internal"))); // MB
+        phoneJson.put(SpecsWebPage.MEMORY.toLowerCase(), rp.parseMemory(web.getMemory().getString("internal")));
+//        phoneJson.put(SpecsWebPage.MISC.toLowerCase(), web.getMiscellaneous());
+        phoneJson.put(SpecsWebPage.PRICE.toLowerCase(), web.getPrice()); // €
+        phoneJson.put(SpecsWebPage.P_GROUP.toLowerCase(), web.getPriceGroup()); // k/10
+//        phoneJson.put(SpecsWebPage.NETWORK.toLowerCase(), web.getNetwork());
+//        phoneJson.put(SpecsWebPage.PLATFORM.toLowerCase(), web.getPlatform());
+//        phoneJson.put(SpecsWebPage.SOUND.toLowerCase(), web.getSound());
+//        phoneJson.put("comments", web.getComments());
 
-        try {
-            jsonFile.createNewFile();
-            FileWriter fileWriter = new FileWriter(jsonFile);
-            fileWriter.write(phoneJson.toString());
-            fileWriter.flush();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (toFile) {
+            try {
+                jsonFile.createNewFile();
+                FileWriter fileWriter = new FileWriter(jsonFile);
+                fileWriter.write(phoneJson.toString());
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
         return true;
     }
 
@@ -153,7 +162,7 @@ public class PhoneHtmlFileParser {
             case SpecsWebPage.SOUND:
                 web.setSound(elementInfo);
                 break;
-            case SpecsWebPage.COMMONS:
+            case SpecsWebPage.COMMS:
                 web.setComms(elementInfo);
                 break;
             case SpecsWebPage.FEATURES:
