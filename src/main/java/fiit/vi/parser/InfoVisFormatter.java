@@ -1,8 +1,10 @@
 package fiit.vi.parser;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -15,39 +17,86 @@ public class InfoVisFormatter {
         BRAND, DISPLAY, PRICE;
     }
     private List<JSONObject> phones;
+
     public InfoVisFormatter(List<JSONObject> phones) {
         this.phones = phones;
     }
 
     public JSONObject groupBy(GROUP_BY group_key) {
-        JSONObject phones = new JSONObject();
-        phones.put("name", "Phones");
         switch(group_key) {
             case BRAND :
-                phones.put("children",groupByBrand());
-                return phones;
+                return groupByBrand();
             case DISPLAY:
-                phones.put("children",groupByDisplay());
+                return groupByDisplay();
             case PRICE:
-                return phones.put("children",groupByPrice());
+                return groupByPrice();
             default :
-                return phones.put("children", groupByBrand());
+                return groupByBrand();
         }
     }
 
-    private JSONArray groupByDisplay() {
+    private JSONObject groupByDisplay() {
         return null;
     }
 
-    private JSONArray groupByPrice() {
+    private JSONObject groupByPrice() {
         return null;
     }
 
-    private JSONArray groupByBrand() {
-        HashSet<String> brands;
+    private JSONObject groupByBrand() {
+
+        Node root = new Node("Phones", "root");
+
         for (JSONObject phone : phones) {
             String brand = phone.getString("brand");
+            Double display = -1.0;
+            Double camera = -1.0;
+            Double ram = -1.0;
+            Long price = -1L;
+            try {
+                display = phone.getDouble(SpecsWebPage.DISPLAY.toLowerCase());
+            } catch (JSONException e) {
+                System.out.println("display not found");
+            }
+            try {
+                camera = phone.getDouble(SpecsWebPage.CAMERA.toLowerCase());
+            } catch (JSONException e) {
+                System.out.println("camera not found");
+            }
+            try {
+                ram = phone.getDouble(SpecsWebPage.RAM.toLowerCase());
+            } catch (JSONException e) {
+                System.out.println("ram not found");
+            }
+//            String memory = phone.getString(SpecsWebPage.MEMORY.toLowerCase());
+//            String weight = phone.getString(SpecsWebPage.BODY.toLowerCase());
+            try {
+                price = phone.getLong(SpecsWebPage.PRICE.toLowerCase());
+            } catch (JSONException e) {
+                System.out.println("price not found");
+            }
+//            String price_group = phone.getString(SpecsWebPage.P_GROUP.toLowerCase());
+            String name = phone.getString("name");
+
+            if (root.get(brand) == null) {
+                root.put(brand, new Node(brand, brand));
+            }
+            if (root.get(brand).get(display.toString()) == null) {
+                root.get(brand).put(display.toString(),new Node("display: " + display.toString() + "\"", display));
+            }
+            if (root.get(brand).get(display.toString()).get(camera.toString()) == null) {
+                root.get(brand).get(display.toString()).put(camera.toString(), new Node("camera: " + camera.toString() + " MP", camera));
+            }
+            if (root.get(brand).get(display.toString()).get(camera.toString()).get(ram.toString()) == null) {
+                root.get(brand).get(display.toString()).get(camera.toString()).put(ram.toString(), new Node("ram: " + ram.toString() + " GB", ram));
+            }
+            if (root.get(brand).get(display.toString()).get(camera.toString()).get(ram.toString()).get(price.toString()) == null) {
+                root.get(brand).get(display.toString()).get(camera.toString()).get(ram.toString()).put(price.toString(), new Node("price: " + price.toString(), price));
+            }
+            if (root.get(brand).get(display.toString()).get(camera.toString()).get(ram.toString()).get(price.toString()).get(name) == null) {
+                root.get(brand).get(display.toString()).get(camera.toString()).get(ram.toString()).get(price.toString()).put(name, new Node(name, name));
+            }
         }
-        return null;
+        return root.toJSON();
     }
 }

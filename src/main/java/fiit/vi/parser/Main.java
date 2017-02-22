@@ -7,9 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -45,23 +44,39 @@ public class Main {
             }
         }
 
-        /* Parse phones into InfoVis readable format */
-        InfoVisFormatter ivf = new InfoVisFormatter(allPhones);
-        JSONObject phoneBrand = ivf.groupBy(InfoVisFormatter.GROUP_BY.BRAND);
-        JSONObject phoneDisplay = ivf.groupBy(InfoVisFormatter.GROUP_BY.DISPLAY);
-        JSONObject phonePrice = ivf.groupBy(InfoVisFormatter.GROUP_BY.PRICE);
-
-
-        File jsonFile = new File(JSON_EXPORT + "phonesIndividual.json");
-        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8);
-        for (JSONObject phone : allPhones) {
-//            fileWriter.write("{\"index\":{\"_id\":\"" + phone.get("id")+ "\"}}\n");
-            fileWriter.write(phone.toString());
-            fileWriter.write("\n");
+        /* Select random only K phones */
+        HashSet<Integer> idx = new HashSet<>();
+        List<JSONObject> kPhones = new ArrayList<>();
+        while (idx.size() < 100) {
+            idx.add(ThreadLocalRandom.current().nextInt(0,allPhones.size()));
         }
+        Iterator<Integer> idk = idx.iterator();
+        while (idk.hasNext()) {
+            kPhones.add(allPhones.get(idk.next()));
+        }
+
+        /* Parse phones into InfoVis readable format */
+        InfoVisFormatter ivf = new InfoVisFormatter(kPhones);
+        JSONObject phoneBrand = ivf.groupBy(InfoVisFormatter.GROUP_BY.BRAND);
+//        JSONObject phoneDisplay = ivf.groupBy(InfoVisFormatter.GROUP_BY.DISPLAY);
+//        JSONObject phonePrice = ivf.groupBy(InfoVisFormatter.GROUP_BY.PRICE);
+
+        File brandFile = new File(JSON_EXPORT + "brandTree.json");
+        OutputStreamWriter fw1 = new OutputStreamWriter(new FileOutputStream(brandFile), StandardCharsets.UTF_8);
+        fw1.write(phoneBrand.toString());
+        fw1.flush();
+        fw1.close();
+
+//        File jsonFile = new File(JSON_EXPORT + "phonesIndividual.json");
+//        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8);
+//        for (JSONObject phone : allPhones) {
+//            fileWriter.write("{\"index\":{\"_id\":\"" + phone.get("id")+ "\"}}\n");
+//            fileWriter.write(phone.toString());
+//            fileWriter.write("\n");
+//        }
 //        fileWriter.write(allPhones.toString());
-        fileWriter.flush();
-        fileWriter.close();
+//        fileWriter.flush();
+//        fileWriter.close();
 
         System.out.println("Parsed " + htmlFiles.size() + " files. Phone files: " + phones + ".");
     }

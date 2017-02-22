@@ -76,7 +76,7 @@ public class PhoneHtmlFileParser {
             System.out.println(title + " --> parsed");
 
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return true;
     }
@@ -102,10 +102,10 @@ public class PhoneHtmlFileParser {
 //        phoneJson.put(SpecsWebPage.ANNOUNCED.toLowerCase(), web.getAnnounced());
 //        phoneJson.put(SpecsWebPage.RELEASED.toLowerCase(), web.getReleased());
         try {
-            phoneJson.put("ram", rp.parseRam(web.getMemory().getString("internal"))); // MB
+            phoneJson.put(SpecsWebPage.RAM.toLowerCase(), rp.parseRam(web.getMemory().getString("internal"))); // MB
             phoneJson.put(SpecsWebPage.MEMORY.toLowerCase(), rp.parseMemory(web.getMemory().getString("internal")));
         } catch (JSONException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 //        phoneJson.put(SpecsWebPage.MISC.toLowerCase(), web.getMiscellaneous());
         phoneJson.put(SpecsWebPage.PRICE.toLowerCase(), web.getPrice()); // €

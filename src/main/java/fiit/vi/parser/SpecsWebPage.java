@@ -24,6 +24,7 @@ public class SpecsWebPage {
     public static final String DISPLAY = "DISPLAY";
     public static final String PLATFORM = "PLATFORM";
     public static final String MEMORY = "MEMORY";
+    public static final String RAM = "RAM";
     public static final String CAMERA = "CAMERA";
     public static final String SOUND = "SOUND";
     public static final String COMMS = "COMMS";
