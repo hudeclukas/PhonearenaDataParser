@@ -1,5 +1,6 @@
 package fiit.vi.parser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -68,7 +69,9 @@ public class PhoneHtmlFileParser {
 //            }
             web.setTitle(title);
             Elements name = body.getElementsByClass(PHONE_NAME);
-            web.setName(name.get(0).text());
+            final String fullName = name.get(0).text();
+            web.setName(fullName);
+            web.setBrand(fullName.split(" ")[0]);
 
             System.out.println(title + " --> parsed");
 
@@ -88,6 +91,7 @@ public class PhoneHtmlFileParser {
         RawGSMarenaParser rp = new RawGSMarenaParser();
 //        phoneJson.put("title", web.getTitle());
         phoneJson.put("name",web.getName());
+        phoneJson.put("brand",web.getBrand());
         //phoneJson.put("specs", web);
         phoneJson.put(SpecsWebPage.BATTERY.toLowerCase(), rp.parseBattery(web.getBattery())); // mAh
         phoneJson.put(SpecsWebPage.BODY.toLowerCase(), rp.parseWeight(web.getBody())); // weight
@@ -97,8 +101,12 @@ public class PhoneHtmlFileParser {
 //        phoneJson.put(SpecsWebPage.FEATURES.toLowerCase(), web.getFeatures());
 //        phoneJson.put(SpecsWebPage.ANNOUNCED.toLowerCase(), web.getAnnounced());
 //        phoneJson.put(SpecsWebPage.RELEASED.toLowerCase(), web.getReleased());
-        phoneJson.put("ram", rp.parseRam(web.getMemory().getString("internal"))); // MB
-        phoneJson.put(SpecsWebPage.MEMORY.toLowerCase(), rp.parseMemory(web.getMemory().getString("internal")));
+        try {
+            phoneJson.put("ram", rp.parseRam(web.getMemory().getString("internal"))); // MB
+            phoneJson.put(SpecsWebPage.MEMORY.toLowerCase(), rp.parseMemory(web.getMemory().getString("internal")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 //        phoneJson.put(SpecsWebPage.MISC.toLowerCase(), web.getMiscellaneous());
         phoneJson.put(SpecsWebPage.PRICE.toLowerCase(), web.getPrice()); // €
         phoneJson.put(SpecsWebPage.P_GROUP.toLowerCase(), web.getPriceGroup()); // k/10

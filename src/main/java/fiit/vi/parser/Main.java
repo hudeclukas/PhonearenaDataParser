@@ -37,15 +37,20 @@ public class Main {
 
         for (File file : htmlFiles) {
             JSONObject json = new JSONObject();
-            boolean isPhone = parser.parseFileToJson(file, PATH_TO_HTMLS+"json\\", json, false);
+            boolean isPhone = parser.parseFileToJson(file, PATH_TO_HTMLS + "json\\", json, false);
             if (isPhone) {
                 phones++;
-                json.put("id",phones);
+                json.put("id", phones);
                 allPhones.add(json);
             }
         }
 
         /* Parse phones into InfoVis readable format */
+        InfoVisFormatter ivf = new InfoVisFormatter(allPhones);
+        JSONObject phoneBrand = ivf.groupBy(InfoVisFormatter.GROUP_BY.BRAND);
+        JSONObject phoneDisplay = ivf.groupBy(InfoVisFormatter.GROUP_BY.DISPLAY);
+        JSONObject phonePrice = ivf.groupBy(InfoVisFormatter.GROUP_BY.PRICE);
+
 
         File jsonFile = new File(JSON_EXPORT + "phonesIndividual.json");
         OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8);
@@ -54,7 +59,7 @@ public class Main {
             fileWriter.write(phone.toString());
             fileWriter.write("\n");
         }
-        fileWriter.write(allPhones.toString());
+//        fileWriter.write(allPhones.toString());
         fileWriter.flush();
         fileWriter.close();
 

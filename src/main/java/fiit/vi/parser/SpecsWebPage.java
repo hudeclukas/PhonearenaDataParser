@@ -11,11 +11,12 @@ import java.util.List;
 public class SpecsWebPage {
 
     public class Price {
+
         public long price = 0;
         public String interval = "";
     }
-
     public static final String NETWORK = "NETWORK";
+
     public static final String LAUNCH = "LAUNCH";
     public static final String ANNOUNCED = "ANNOUNCED";
     public static final String RELEASED = "RELEASED";
@@ -31,11 +32,12 @@ public class SpecsWebPage {
     public static final String MISC = "MISC";
     public static final String PRICE = "PRICE";
     public static final String P_GROUP = "PRICE GROUP";
-
     private String fullSpecs;
 
     private String title = "";
+
     private String name = "";
+    private String brand = "";
     private String network = "";
     private String announced = "";
     private String released = "";
@@ -51,7 +53,6 @@ public class SpecsWebPage {
     private String miscellaneous = "";
     private long price = 0;
     private String priceGroup = "";
-
     private List<String> comments = new LinkedList<>();
 
     @Override
@@ -148,6 +149,14 @@ public class SpecsWebPage {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
     public String getNetwork() {
